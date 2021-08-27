@@ -18,6 +18,8 @@ import {
 
 import { Logo } from '../../elements/Logo';
 import FireBase, { PersistenceMode } from '../../../config/firebase/index';
+import { useAuth } from '../../../contexts/AuthUserContext';
+
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
@@ -25,6 +27,7 @@ const validationSchema = yup.object().shape({
 });
 
 const Login: React.FC = () => {
+  const { signInWithEmailAndPassword } = useAuth();
   const {
     values,
     errors,
@@ -35,14 +38,12 @@ const Login: React.FC = () => {
     isSubmitting,
   } = useFormik({
     onSubmit: async (values, form) => {
+
       FireBase.auth().setPersistence(PersistenceMode)
       try {
-        const user = await FireBase.auth().signInWithEmailAndPassword(
-          values.email,
-          values.password
-        );
+        await signInWithEmailAndPassword(values.email, values.password);
 
-        console.log(user);
+        console.log('Sucesso. O usuário está logado com Firebase');
       } catch (error) {
         console.log(`ERROR: ${error}`);
       }

@@ -1,9 +1,13 @@
 /* eslint-disable react/no-children-prop */
-import React from 'react';
-import Link  from 'next/link'
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+
+import { useAuth } from '../../../contexts/AuthUserContext';
 
 import {
   Container,
@@ -19,7 +23,6 @@ import {
 } from '@chakra-ui/react';
 
 import { Logo } from '../../elements/Logo';
-import FireBase from '../../../config/firebase/index'
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
@@ -28,6 +31,9 @@ const validationSchema = yup.object().shape({
 });
 
 const SingnUp: React.FC = () => {
+  const { createUserWithEmailAndPassword, authUser, loading} = useAuth();
+  const router = useRouter();
+
   const {
     values,
     errors,
@@ -39,12 +45,11 @@ const SingnUp: React.FC = () => {
   } = useFormik({
     onSubmit: async (values, form) => {
       try {
-      const user = await FireBase.auth().createUserWithEmailAndPassword(values.email, values.password);
-
-      console.log(user)
-
+        await createUserWithEmailAndPassword(values.email, values.password);
+        if (!loading && !authUser) router.push('/');
+        console.log('Sucesso. O usuário é criado no Firebase');
       } catch (error) {
-        console.log(`ERROR: ${error}`)
+        console.log(`ERROR: ${error}`);
       }
     },
     validationSchema,
@@ -115,8 +120,8 @@ const SingnUp: React.FC = () => {
             width='100%'
             onClick={() => handleSubmit()}
             isLoading={isSubmitting}
-            loadingText="Submetendo"
-            colorScheme="blue"
+            loadingText='Submetendo'
+            colorScheme='blue'
           >
             Cadastrar
           </Button>
@@ -124,7 +129,6 @@ const SingnUp: React.FC = () => {
       </Box>
 
       <Link href='/'>Já tem uma conta? Acesse!</Link>
-
     </Container>
   );
 };
