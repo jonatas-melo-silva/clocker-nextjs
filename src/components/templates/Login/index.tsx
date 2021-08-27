@@ -1,5 +1,6 @@
 /* eslint-disable react/no-children-prop */
 import React from 'react';
+import Link  from 'next/link'
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -13,22 +14,17 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
-  InputGroup,
-  InputLeftAddon,
 } from '@chakra-ui/react';
 
 import { Logo } from '../../elements/Logo';
-import { FareBase } from '../../../config/firebase/index'
+import FireBase, { PersistenceMode } from '../../../config/firebase/index';
 
 const validationSchema = yup.object().shape({
   email: yup.string().email('E-mail inválido').required('E-mail é obrigatório'),
   password: yup.string().required('Senha é obrigatória'),
-  username: yup.string().required('Nome de usuário é obrigatório'),
 });
 
-// import { Container } from './styles';
-
-const Home: React.FC = () => {
+const Login: React.FC = () => {
   const {
     values,
     errors,
@@ -38,7 +34,18 @@ const Home: React.FC = () => {
     handleBlur,
     isSubmitting,
   } = useFormik({
-    onSubmit: (values, form) => {
+    onSubmit: async (values, form) => {
+      FireBase.auth().setPersistence(PersistenceMode)
+      try {
+        const user = await FireBase.auth().signInWithEmailAndPassword(
+          values.email,
+          values.password
+        );
+
+        console.log(user);
+      } catch (error) {
+        console.log(`ERROR: ${error}`);
+      }
     },
     validationSchema,
     initialValues: {
@@ -47,6 +54,7 @@ const Home: React.FC = () => {
       username: '',
     },
   });
+
   return (
     <Container p={4} centerContent>
       <Logo />
@@ -86,37 +94,23 @@ const Home: React.FC = () => {
           </FormHelperText>
         </FormControl>
 
-        <FormControl id='username' isRequired p={4}>
-          <InputGroup size='lg'>
-            <InputLeftAddon children={'clock.work/'} />
-            <Input
-              type='username'
-              value={values.username}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder='Digite seu nome'
-            />
-          </InputGroup>
-          <FormHelperText textColor={`#e74c3c`}>
-            {errors.username && touched.username && errors.username}
-          </FormHelperText>
-        </FormControl>
-
         <Box p={4}>
           <Button
             type='submit'
             width='100%'
             onClick={() => handleSubmit()}
             isLoading={isSubmitting}
-            loadingText="Submetendo"
-            colorScheme="blue"
+            loadingText='Submetendo'
+            colorScheme='blue'
           >
             Entrar
           </Button>
         </Box>
       </Box>
+
+      <Link href='/signup'>Ainda não tem uma conta Cadastre-se</Link>
     </Container>
   );
 };
 
-export default Home;
+export default Login;
