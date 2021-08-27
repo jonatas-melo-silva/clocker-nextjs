@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import Template from '../components/templates/Home'
+import Template from '../components/templates/Login'
 
-const Home: NextPage = () => {
+const Login: NextPage = () => {
   return (
     <div>
       <Template/>
@@ -9,4 +9,4 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home
+export default Login
