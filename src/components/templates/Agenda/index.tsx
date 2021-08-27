@@ -1,9 +1,23 @@
-import React from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { Button, Container } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-// import { Container } from './styles';
+import { useAuth } from '../../../contexts/AuthUserContext';
 
-const agenda: React.FC = () => {
-  return <div />;
-}
+const Agenda: React.FC = () => {
+  const { authUser, loading, signOut } = useAuth();
+  const router = useRouter();
 
-export default agenda;
+  useEffect(() => {
+    if (!loading && !authUser) router.push('/');
+  }, [authUser, loading]);
+
+  return (
+    <Container p={4} centerContent>
+      <Button onClick={signOut}>Sair</Button>
+    </Container>
+  );
+};
+
+export default Agenda;
