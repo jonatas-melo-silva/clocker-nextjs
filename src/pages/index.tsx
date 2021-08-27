@@ -1,12 +1,23 @@
-import type { NextPage } from 'next'
-import Template from '../components/templates/Login'
+import type { NextPage } from 'next';
+import { Container, Spinner } from '@chakra-ui/react';
 
-const Login: NextPage = () => {
-  return (
-    <div>
-      <Template/>
-    </div>
-  )
-}
+import { useAuth } from '../contexts/AuthUserContext';
 
-export default Login
+import Login from '../components/templates/Login';
+import Agenda from '../components/templates/Agenda';
+
+const Home: NextPage = () => {
+  const { authUser, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <Container p={4} centerContent>
+        <Spinner />
+      </Container>
+    )
+  }
+
+  return authUser ? <Agenda /> : <Login />;
+};
+
+export default Home;
